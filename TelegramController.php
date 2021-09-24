@@ -52,6 +52,8 @@ class TelegramController extends Controller
                 break;
             case '/checkin': $this->checkin();
                 break;
+            case '/lucky': $this->lucky();
+                break;
             default: $this->help();
         }
     }
@@ -138,6 +140,8 @@ class TelegramController extends Controller
         $commands = [
             '/bind 订阅地址 - 绑定你的' . config('v2board.app_name', 'V2Board') . '账号',
             '/traffic - 查询流量信息',
+            '/checkin - 每日签到',
+            '/lucky - 抽奖',
             '/getlatesturl - 获取最新的' . config('v2board.app_name', 'V2Board') . '网址',
             '/unbind - 解除绑定'
         ];
@@ -179,6 +183,7 @@ class TelegramController extends Controller
         $last = date('Ymd', $lastcheckinat);
         $today = date('Ymd');
         if ($last != $today ) {
+            //吱吱提醒
             //下面括号内填写签到的奖励范围，单位MB，例如填写 (1,1024);表示随机奖励1-1024MB
             $randomtraffic = random_int(1,1024);
             $gifttraffic = $randomtraffic * 1024 * 1024;
@@ -192,7 +197,28 @@ class TelegramController extends Controller
         }
         $telegramService->sendMessage($msg->chat_id, $text, 'markdown');
     }
-    
+    private function lucky()
+    {
+        $msg = $this->msg;
+        if (!$msg->is_private) return;
+        $user = User::where('telegram_id', $msg->chat_id)->first();
+        $telegramService = new TelegramService();
+        if (!$user) {
+            $this->help();
+            $telegramService->sendMessage($msg->chat_id, '没有查询到您的用户信息，请先绑定账号', 'markdown');
+            return;
+        }      
+            //吱吱提醒  
+            //下面括号内填写签到的奖励范围，单位MB，例如填写 (-1024,1024);表示随机奖励-1024到1024MB
+            $randomtraffic = random_int(-1024,1024);
+            $gifttraffic = $randomtraffic * 1024 * 1024;
+            $user->transfer_enable += $gifttraffic;
+            $gift = Helper::trafficConvert($gifttraffic);
+            $user->save();
+            $text = "恭喜您获得奖励：`{$gift}`";
+        
+        $telegramService->sendMessage($msg->chat_id, $text, 'markdown');
+    }
     private function getLatestUrl()
     {
         $msg = $this->msg;
