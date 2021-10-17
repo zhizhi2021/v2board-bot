@@ -76,6 +76,7 @@ class TelegramController extends Controller
         $obj->command = $text[0];
         $obj->args = array_slice($text, 1);
         $obj->chat_id = $data['message']['chat']['id'];
+        $obj->user_id = $data['message']['from']['id'];
         $obj->message_id = $data['message']['message_id'];
         $obj->message_type = !isset($data['message']['reply_to_message']['text']) ? 'send' : 'reply';
         $obj->text = $data['message']['text'];
@@ -152,8 +153,8 @@ class TelegramController extends Controller
     private function traffic()
     {
         $msg = $this->msg;
-        if (!$msg->is_private) return;
-        $user = User::where('telegram_id', $msg->chat_id)->first();
+        //if (!$msg->is_private) return;
+        $user = User::where('telegram_id', $msg->user_id)->first();
         $telegramService = new TelegramService();
         if (!$user) {
             $this->help();
@@ -171,8 +172,8 @@ class TelegramController extends Controller
     private function checkin()
     {
         $msg = $this->msg;
-        if (!$msg->is_private) return;
-        $user = User::where('telegram_id', $msg->chat_id)->first();
+        //if (!$msg->is_private) return;
+        $user = User::where('telegram_id', $msg->user_id)->first();
         $telegramService = new TelegramService();
         if (!$user) {
             $this->help();
