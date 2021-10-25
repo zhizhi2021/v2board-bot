@@ -1,4 +1,4 @@
-# **v2board-bot 吱吱修改版**
+# **v2board-bot 吱吱修改版 基于1.5.3**
 
 测试bot： [@xiaomiaomiao_bot](https://t.me/xiaomiaomiao_bot)
 ### v2board更改为inlinebutton模式
