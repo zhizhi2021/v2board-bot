@@ -1,7 +1,7 @@
 # **v2board-bot 吱吱修改版**
 
 测试bot： [@xiaomiaomiao_bot](https://t.me/xiaomiaomiao_bot)
-### v2board增加签到功能及抽奖功能
+### v2board更改为inlinebutton模式
 - 使用方法：
 - 替换上述文件即可
 - 如有bug，请联系吱吱反馈
