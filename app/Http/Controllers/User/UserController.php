@@ -10,11 +10,9 @@ use App\Utils\CacheKey;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Plan;
-use App\Models\ServerV2ray;
 use App\Models\Ticket;
 use App\Utils\Helper;
 use App\Models\Order;
-use App\Models\ServerLog;
 use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
@@ -70,7 +68,8 @@ class UserController extends Controller
                 'plan_id',
                 'discount',
                 'commission_rate',
-                'telegram_id'
+                'telegram_id',
+                'uuid'
             ])
             ->first();
         if (!$user) {
@@ -103,7 +102,6 @@ class UserController extends Controller
     {
         $user = User::where('id', $request->session()->get('id'))
             ->select([
-                'id',
                 'plan_id',
                 'token',
                 'expired_at',
@@ -189,14 +187,20 @@ class UserController extends Controller
     public function getResetDay(User $user)
     {
         if ($user->expired_at <= time() || $user->expired_at === NULL) return null;
+        // if reset method is not reset
+        if (isset($user->plan->reset_traffic_method) && $user->plan->reset_traffic_method === 2) return null;
         $day = date('d', $user->expired_at);
         $today = date('d');
         $lastDay = date('d', strtotime('last day of +0 months'));
 
-        if ((int)config('v2board.reset_traffic_method') === 0) {
+        if ((int)config('v2board.reset_traffic_method') === 0 ||
+            (isset($user->plan->reset_traffic_method) && $user->plan->reset_traffic_method === 0))
+        {
             return $lastDay - $today;
         }
-        if ((int)config('v2board.reset_traffic_method') === 1) {
+        if ((int)config('v2board.reset_traffic_method') === 1 ||
+            (isset($user->plan->reset_traffic_method) && $user->plan->reset_traffic_method === 1))
+        {
             if ((int)$day >= (int)$today && (int)$day >= (int)$lastDay) {
                 return $lastDay - $today;
             }
