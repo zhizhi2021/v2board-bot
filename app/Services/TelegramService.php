@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Jobs\SendTelegramJob;
 use App\Models\User;
 use \Curl\Curl;
+use Illuminate\Mail\Markdown;
 
 class TelegramService {
     protected $api;
@@ -13,15 +14,27 @@ class TelegramService {
         $this->api = 'https://api.telegram.org/bot' . config('v2board.telegram_bot_token', $token) . '/';
     }
 
+    public function sendMessage(int $chatId, string $text, string $parseMode = '')
+    {
+        if ($parseMode === 'markdown') {
+            $text = str_replace('_', '\_', $text);
+        }
+        $this->request('sendMessage', [
+            'chat_id' => $chatId,
+            'text' => $text,
+            'parse_mode' => $parseMode
+        ]);
+    }
     public function sendMessageMarkup(int $chatId, string $text, string $reply_markup)
     {
         $this->request('sendMessage', [
             'chat_id' => $chatId,
             'text' => $text,
-            'reply_markup' => $reply_markup
+            'reply_markup' => $reply_markup,
+            'parse_mode' => 'markdown'
         ]);
     }
-    public function answerCallbackQuery(int $callback_query_id, string $text, $show_alert = true)
+    public function answerCallbackQuery(int $callback_query_id, string $text, string $show_alert)
     {
         $this->request('answerCallbackQuery', [
             'callback_query_id' => $callback_query_id,
@@ -35,18 +48,10 @@ class TelegramService {
             'chat_id' => $chatId,
             'message_id' => $message_id,
             'text' => $text,
-            'reply_markup' => $reply_markup
+            'reply_markup' => $reply_markup,
+            'parse_mode' => 'markdown'
         ]);
     }
-    public function sendMessage(int $chatId, string $text, string $parseMode = '')
-    {
-        $this->request('sendMessage', [
-            'chat_id' => $chatId,
-            'text' => $text,
-            'parse_mode' => $parseMode
-        ]);
-    }
-
     public function getMe()
     {
         return $this->request('getMe');
@@ -58,7 +63,7 @@ class TelegramService {
             'url' => $url
         ]);
     }
-   
+
     private function request(string $method, array $params = [])
     {
         $curl = new Curl();
@@ -67,7 +72,7 @@ class TelegramService {
         $curl->close();
         if (!isset($response->ok)) abort(500, '请求失败');
         if (!$response->ok) {
-            abort(500, '来自TG的错误：' . $response->description);
+            abort(500, '吱吱提醒：来自TG的错误：' . $response->description);
         }
         return $response;
     }
