@@ -21,6 +21,13 @@ class MyWallet extends Telegram {
         $balance = $user->balance / 100 ;
         $total = $commission_balance + $balance ;
         $text = "💰我的钱包\n————————————\n钱包总额：$total 元\n账户余额：$balance 元\n推广佣金：$commission_balance 元";
-      $telegramService->answerCallbackQuery($message->callback_query_id, $text ,'true');
+        $reply_markup =  json_encode([
+            'inline_keyboard' => [
+                [
+                    ['text' => "返回菜单", 'callback_data' => '/start'],
+                ]
+            ]
+        ]); 
+        $telegramService->editMessageText($message->chat_id,$message->message_id,$text, $reply_markup);
     }
 }
