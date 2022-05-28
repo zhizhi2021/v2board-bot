@@ -48,8 +48,7 @@ class Invite extends Telegram {
         $inviteCode->save();
         }
         $invite_url = Helper::getSubscribeHost() . "/register?code={$inviteCode->code}"; 
-        $text = "我的邀请\n————————————\n我邀请的人数：$inviteusers 人\n我的返利比例：$commission_rate %\n现有效的佣金：$active_commission 元\n确认中的佣金：$process_commisson 元\n目前可用佣金：$commission_balance 元\n";
-        $text2 = "您的推广链接： \n————————————\n`$invite_url`";
+        $text = "我的邀请\n————————————\n我邀请的人数：$inviteusers 人\n我的返利比例：$commission_rate %\n现有效的佣金：$active_commission 元\n确认中的佣金：$process_commisson 元\n目前可用佣金：$commission_balance 元\n您的推广链接： \n————————————\n`$invite_url`";
         $reply_markup =  json_encode([
             'inline_keyboard' => [
                 [
@@ -57,8 +56,6 @@ class Invite extends Telegram {
                 ]
             ]
         ]); 
-        $telegramService->editMessageText($message->chat_id,$message->message_id, $text2, $reply_markup); 
-        $telegramService->answerCallbackQuery($message->callback_query_id, $text);
-    
+        $telegramService->editMessageText($message->chat_id,$message->message_id, $text, $reply_markup); 
     }
 }
