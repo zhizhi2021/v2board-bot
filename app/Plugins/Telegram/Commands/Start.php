@@ -32,7 +32,10 @@ class Start extends Telegram {
                                  ],
                                 [
                                     ['text' => "💲邀请返利", 'callback_data' => '/invite'],['text' => "💁最新官网", 'url' => $app_url]
-                                ]
+                                ],
+                                [
+                                    ['text' => "🌟在线客服", 'callback_data' => '/kefu'],
+                                 ]
                             ]
                         ]);
         }else{
