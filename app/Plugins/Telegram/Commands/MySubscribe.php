@@ -32,7 +32,13 @@ class MySubscribe extends Telegram {
         $reset_day = $UserController->getResetDay($user);
         $expired_at = date("Y-m-d",$user->expired_at);
         $text = "我的订阅\n————————————\n套餐名称：$plan_name\n套餐流量：$plan_transfer GB\n离重置流量还有：$reset_day 天\n到期时间：$expired_at";
-        $telegramService->answerCallbackQuery($message->callback_query_id, $text,'true');
-      
+        $reply_markup =  json_encode([
+            'inline_keyboard' => [
+                [
+                    ['text' => "返回菜单", 'callback_data' => '/start'],
+                ]
+            ]
+        ]); 
+        $telegramService->editMessageText($message->chat_id,$message->message_id,  $text, $reply_markup);
     }
 }
